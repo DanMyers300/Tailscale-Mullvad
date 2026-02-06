@@ -6,3 +6,4 @@ iptables -A FORWARD -i tailscale0 -o eth0 -j ACCEPT
 iptables -A FORWARD -i eth0 -o tailscale0 -j ACCEPT
 iptables -t nat -A POSTROUTING -o tun0 -j MASQUERADE
 iptables -t nat -A POSTROUTING -o eth0 -d 192.200.0.0/24 -j MASQUERADE
+iptables -t nat -A POSTROUTING -o eth0 -d 172.237.61.0/24 -j MASQUERADE
