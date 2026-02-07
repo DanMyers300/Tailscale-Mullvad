@@ -1,16 +1,16 @@
 # Route return traffic to Tailscale clients
 ip rule add to 100.64.0.0/10 lookup 52 priority 95
 
-# Block Tailscale traffic from bypassing VPN (INSERT to run before Gluetun's rules)
-iptables -I FORWARD -i tailscale0 -o eth0 -j DROP
-ip6tables -I FORWARD -i tailscale0 -o eth0 -j DROP
+# Block Tailscale traffic from bypassing VPN (INSERT to run before other rules)
+iptables-legacy -I FORWARD -i tailscale0 -o eth0 -j DROP
+ip6tables-legacy -I FORWARD -i tailscale0 -o eth0 -j DROP
 
 # Allow Tailscale traffic through VPN tunnel
-iptables -I FORWARD -i tailscale0 -o tun0 -j ACCEPT
-iptables -I FORWARD -i tun0 -o tailscale0 -j ACCEPT
-ip6tables -I FORWARD -i tailscale0 -o tun0 -j ACCEPT
-ip6tables -I FORWARD -i tun0 -o tailscale0 -j ACCEPT
+iptables-legacy -I FORWARD -i tailscale0 -o tun0 -j ACCEPT
+iptables-legacy -I FORWARD -i tun0 -o tailscale0 -j ACCEPT
+ip6tables-legacy -I FORWARD -i tailscale0 -o tun0 -j ACCEPT
+ip6tables-legacy -I FORWARD -i tun0 -o tailscale0 -j ACCEPT
 
 # NAT outbound VPN traffic
-iptables -t nat -A POSTROUTING -o tun0 -j MASQUERADE
-ip6tables -t nat -A POSTROUTING -o tun0 -j MASQUERADE
+iptables-legacy -t nat -A POSTROUTING -o tun0 -j MASQUERADE
+ip6tables-legacy -t nat -A POSTROUTING -o tun0 -j MASQUERADE
