@@ -1,11 +1,12 @@
+# Route return traffic to Tailscale clients
 ip rule add to 100.64.0.0/10 lookup 52 priority 95
-iptables -t mangle -A PREROUTING -i tailscale0 -j MARK --set-mark 0x0
+
+# Forward Tailscale traffic through VPN tunnel
 iptables -A FORWARD -i tailscale0 -o tun0 -j ACCEPT
 iptables -A FORWARD -i tun0 -o tailscale0 -j ACCEPT
-iptables -A FORWARD -i tailscale0 -o eth0 -d 192.200.0.0/24 -j ACCEPT
-iptables -A FORWARD -i eth0 -s 192.200.0.0/24 -o tailscale0 -j ACCEPT
-iptables -A FORWARD -i tailscale0 -o eth0 -d 172.237.61.0/24 -j ACCEPT
-iptables -A FORWARD -i eth0 -s 172.237.61.0/24 -o tailscale0 -j ACCEPT
+
+# Block any Tailscale traffic from bypassing VPN
+iptables -A FORWARD -i tailscale0 -o eth0 -j DROP
+
+# NAT outbound VPN traffic
 iptables -t nat -A POSTROUTING -o tun0 -j MASQUERADE
-iptables -t nat -A POSTROUTING -o eth0 -d 192.200.0.0/24 -j MASQUERADE
-iptables -t nat -A POSTROUTING -o eth0 -d 172.237.61.0/24 -j MASQUERADE
